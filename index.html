@@ -1,0 +1,1202 @@
+<!DOCTYPE html>
+<html lang="ro" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz MK Tech S.R.L. | Câștigă Reducerea</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600;700&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #04070d;
+            color: #f3f4f6;
+            overflow-x: hidden;
+        }
+        .font-tech { font-family: 'Orbitron', sans-serif; }
+        .font-mono-tech { font-family: 'JetBrains Mono', monospace; }
+        
+        .neon-glow {
+            box-shadow: 0 0 45px rgba(6, 182, 212, 0.22), inset 0 0 20px rgba(6, 182, 212, 0.06);
+        }
+        .neon-glow-emerald {
+            box-shadow: 0 0 50px rgba(16, 185, 129, 0.35), inset 0 0 25px rgba(16, 185, 129, 0.12);
+        }
+        .text-glow-cyan {
+            text-shadow: 0 0 15px rgba(6, 182, 212, 0.7);
+        }
+        .text-glow-emerald {
+            text-shadow: 0 0 15px rgba(16, 185, 129, 0.8);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .animate-fade {
+            animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes spinSlow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        @keyframes spinReverse {
+            from { transform: rotate(360deg); }
+            to { transform: rotate(0deg); }
+        }
+        .ring-spin-1 { animation: spinSlow 8s linear infinite; }
+        .ring-spin-2 { animation: spinReverse 5s linear infinite; }
+        .ring-spin-3 { animation: spinSlow 3s cubic-bezier(0.4, 0, 0.2, 1) infinite; }
+
+        @keyframes scanline {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(600%); }
+        }
+        .scanline-bar {
+            animation: scanline 2.8s linear infinite;
+        }
+
+        .hud-corner {
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            border-color: #22d3ee;
+            pointer-events: none;
+            transition: border-color 0.3s ease;
+        }
+        .hud-tl { top: -1px; left: -1px; border-top: 2px solid; border-left: 2px solid; border-top-left-radius: 12px; }
+        .hud-tr { top: -1px; right: -1px; border-top: 2px solid; border-right: 2px solid; border-top-right-radius: 12px; }
+        .hud-bl { bottom: -1px; left: -1px; border-bottom: 2px solid; border-left: 2px solid; border-bottom-left-radius: 12px; }
+        .hud-br { bottom: -1px; right: -1px; border-bottom: 2px solid; border-right: 2px solid; border-bottom-right-radius: 12px; }
+
+        #intro-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 9999px;
+            background: #22d3ee;
+            box-shadow: 0 0 25px 6px rgba(34, 211, 238, 0.9), 0 0 60px 15px rgba(6, 182, 212, 0.5);
+            transform: scale(0);
+            transition: all 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        #intro-dot.dot-appear {
+            transform: scale(1);
+        }
+        #intro-dot.dot-line {
+            width: 260px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #22d3ee, #34d399, #22d3ee, transparent);
+            box-shadow: 0 0 30px 4px rgba(34, 211, 238, 0.8);
+            transform: scale(1);
+        }
+        #intro-dot.dot-collapse {
+            width: 8px;
+            height: 8px;
+            transform: scale(1.3);
+            background: #34d399;
+            box-shadow: 0 0 35px 10px rgba(52, 211, 153, 0.95);
+        }
+        #intro-dot.dot-burst {
+            width: 14px;
+            height: 14px;
+            transform: scale(18);
+            opacity: 0;
+            transition: all 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .intro-text-stage {
+            opacity: 0;
+            transform: scale(0.15);
+            filter: blur(16px);
+            letter-spacing: -0.05em;
+            transition:
+                opacity 0.55s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+                filter 0.55s cubic-bezier(0.16, 1, 0.3, 1),
+                letter-spacing 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .intro-text-stage.stage-active {
+            opacity: 1;
+            transform: scale(1);
+            filter: blur(0px);
+            letter-spacing: 0.18em;
+        }
+        .intro-text-stage.stage-exit {
+            opacity: 0;
+            transform: scale(0.08);
+            filter: blur(18px);
+            letter-spacing: -0.08em;
+            transition: all 0.4s cubic-bezier(0.55, 0.05, 0.67, 0.19);
+        }
+
+        @keyframes pulseRing {
+            0% { transform: scale(0.2); opacity: 0.9; }
+            100% { transform: scale(4.5); opacity: 0; }
+        }
+        .shockwave-ring {
+            position: absolute;
+            width: 48px;
+            height: 48px;
+            border-radius: 9999px;
+            border: 1.5px solid rgba(34, 211, 238, 0.7);
+            pointer-events: none;
+            animation: pulseRing 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-4 selection:bg-cyan-500 selection:text-black relative">
+
+    <canvas id="bg-canvas" class="fixed inset-0 pointer-events-none z-0 opacity-60"></canvas>
+
+    <div id="intro-splash" class="fixed inset-0 z-40 flex flex-col items-center justify-center bg-[#04070d]/95 backdrop-blur-xl transition-opacity duration-600 select-none">
+        <div id="shockwave-container" class="relative flex items-center justify-center w-full h-48">
+            <div id="intro-dot" class="absolute"></div>
+
+            <div id="intro-text-1" class="intro-text-stage absolute text-center px-4">
+                <h1 class="font-tech text-3xl sm:text-5xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-white to-emerald-300 text-glow-cyan">
+                    MkTech
+                </h1>
+                <div class="w-32 h-0.5 mx-auto mt-3 bg-gradient-to-r from-transparent via-cyan-400 to-transparent"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="app" class="w-full max-w-2xl mx-auto relative z-10">
+
+        <div id="loading-screen" class="opacity-0 scale-95 relative overflow-hidden bg-slate-950/85 border border-cyan-500/30 rounded-2xl p-6 md:p-8 backdrop-blur-2xl shadow-2xl neon-glow transition-all duration-500">
+            <div class="hud-corner hud-tl"></div>
+            <div class="hud-corner hud-tr"></div>
+            <div class="hud-corner hud-bl"></div>
+            <div class="hud-corner hud-br"></div>
+
+            <div class="scanline-bar absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-transparent via-cyan-400/10 to-transparent pointer-events-none"></div>
+
+            <div class="flex items-center justify-between border-b border-slate-800/80 pb-3 mb-6 text-xs font-mono-tech">
+                <div class="flex items-center gap-2">
+                    <span id="status-dot" class="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-ping"></span>
+                    <span class="text-slate-300 font-semibold tracking-wider">MK_OS // BOOTLOADER v4.2</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span id="telemetry-clock" class="hidden sm:inline text-slate-400">CORE: 4.65 GHz</span>
+                    <span id="status-badge" class="text-cyan-400 bg-cyan-950/80 px-2.5 py-0.5 rounded border border-cyan-700/50">INITIALIZING</span>
+                </div>
+            </div>
+
+            <div class="flex flex-col items-center justify-center my-2 relative">
+                <div id="core-glow" class="absolute w-36 h-36 bg-cyan-500/20 rounded-full blur-2xl pointer-events-none transition-colors duration-500"></div>
+
+                <div class="relative w-36 h-36 mb-4 flex items-center justify-center">
+                    <svg class="absolute inset-0 w-full h-full ring-spin-1 text-cyan-500/40" viewBox="0 0 100 100">
+                        <circle cx="50" cy="50" r="46" fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="18 8 4 8" />
+                        <circle cx="50" cy="50" r="42" fill="none" stroke="currentColor" stroke-width="0.5" stroke-dasharray="4 12" />
+                    </svg>
+
+                    <svg class="absolute inset-2 w-32 h-32 ring-spin-2 text-blue-400/60" viewBox="0 0 100 100">
+                        <circle cx="50" cy="50" r="44" fill="none" stroke="currentColor" stroke-width="2.5" stroke-dasharray="35 25 10 25" stroke-linecap="round" />
+                    </svg>
+
+                    <svg id="inner-ring" class="absolute inset-5 w-26 h-26 ring-spin-3 text-cyan-300" viewBox="0 0 100 100">
+                        <circle cx="50" cy="50" r="42" fill="none" stroke="currentColor" stroke-width="3" stroke-dasharray="60 140" stroke-linecap="round" />
+                    </svg>
+
+                    <div class="text-center z-10">
+                        <div id="boot-percent" class="font-tech text-2xl md:text-3xl font-black text-white text-glow-cyan tracking-tight">00%</div>
+                        <div id="core-subtext" class="font-mono-tech text-[9px] uppercase tracking-widest text-cyan-400 mt-0.5">SYNCING</div>
+                    </div>
+                </div>
+
+                <h1 id="scramble-title" class="font-tech text-2xl md:text-3xl font-black tracking-widest text-white text-center text-glow-cyan">
+                    MK TECH S.R.L.
+                </h1>
+                <p class="text-[11px] font-mono-tech text-cyan-400/80 tracking-widest uppercase mt-1">
+                    Colegiul Economic „Mihail Kogălniceanu” Focșani
+                </p>
+            </div>
+
+            <div class="grid grid-cols-3 gap-2 my-5 font-mono-tech text-[11px]">
+                <div class="bg-slate-900/80 border border-slate-800 rounded-lg p-2 text-center">
+                    <span class="text-slate-500 block text-[9px]">MEMORIE</span>
+                    <span id="metric-ram" class="text-cyan-300 font-bold">0 / 32 GB</span>
+                </div>
+                <div class="bg-slate-900/80 border border-slate-800 rounded-lg p-2 text-center">
+                    <span class="text-slate-500 block text-[9px]">SECURITATE</span>
+                    <span id="metric-sec" class="text-amber-400 font-bold">SCANNING...</span>
+                </div>
+                <div class="bg-slate-900/80 border border-slate-800 rounded-lg p-2 text-center">
+                    <span class="text-slate-500 block text-[9px]">CUPON ENGINE</span>
+                    <span id="metric-crypto" class="text-emerald-400 font-bold">SHA-MK32</span>
+                </div>
+            </div>
+
+            <div id="boot-logs" class="font-mono-tech text-xs bg-slate-950/95 border border-slate-800/90 rounded-xl p-3.5 h-32 overflow-hidden space-y-1.5 text-slate-300 mb-5 shadow-inner"></div>
+
+            <div class="relative w-full bg-slate-900 h-3 rounded-full overflow-hidden border border-slate-800 p-0.5">
+                <div id="boot-bar" class="bg-gradient-to-r from-blue-600 via-cyan-400 to-emerald-300 h-full rounded-full transition-all duration-75 shadow-[0_0_15px_#22d3ee]" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <div id="level-screen" class="hidden bg-slate-900/90 border border-slate-800 rounded-2xl p-6 md:p-8 backdrop-blur-xl shadow-2xl neon-glow animate-fade">
+            <div class="text-center mb-8">
+                <span class="text-xs uppercase font-tech tracking-widest text-cyan-400 bg-cyan-950/60 px-3 py-1 rounded-full border border-cyan-800/50">F.E. MK Tech S.R.L. Focșani</span>
+                <h2 class="font-tech text-2xl md:text-3xl font-extrabold mt-3 text-white">Alege Nivelul & Reducerea</h2>
+                <p class="text-slate-400 text-sm mt-2">Răspunde la întrebări despre tehnologie, birotică și firma noastră pentru a debloca un cupon criptat!</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <button onmouseenter="SoundFX.hover()" onclick="startQuiz('easy')" class="group text-left p-5 rounded-xl bg-slate-800/60 border border-slate-700/60 hover:border-cyan-500 hover:bg-slate-800 transition-all duration-300 hover:-translate-y-1 cursor-pointer flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="text-2xl">🥉</span>
+                            <span class="text-[10px] font-tech uppercase px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Ușor</span>
+                        </div>
+                        <div class="font-tech text-xl font-bold text-cyan-400 group-hover:text-cyan-300">Reducere 5%</div>
+                    </div>
+                    <div class="text-xs text-slate-400 mt-4 space-y-1.5 border-t border-slate-700/50 pt-3">
+                        <p>• 5 întrebări foarte ușoare</p>
+                        <p>• 30 secunde / întrebare</p>
+                        <p class="text-slate-300 font-medium">• Prag minim: 3 corecte</p>
+                    </div>
+                </button>
+
+                <button onmouseenter="SoundFX.hover()" onclick="startQuiz('medium')" class="group text-left p-5 rounded-xl bg-slate-800/60 border border-slate-700/60 hover:border-cyan-500 hover:bg-slate-800 transition-all duration-300 hover:-translate-y-1 cursor-pointer flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="text-2xl">🥈</span>
+                            <span class="text-[10px] font-tech uppercase px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20">Mediu</span>
+                        </div>
+                        <div class="font-tech text-xl font-bold text-cyan-400 group-hover:text-cyan-300">Reducere 10%</div>
+                    </div>
+                    <div class="text-xs text-slate-400 mt-4 space-y-1.5 border-t border-slate-700/50 pt-3">
+                        <p>• 7 întrebări (PC + MK Tech)</p>
+                        <p>• 30 secunde / întrebare</p>
+                        <p class="text-slate-300 font-medium">• Prag minim: 5 corecte</p>
+                    </div>
+                </button>
+
+                <button onmouseenter="SoundFX.hover()" onclick="startQuiz('hard')" class="group text-left p-5 rounded-xl bg-slate-800/60 border border-slate-700/60 hover:border-cyan-500 hover:bg-slate-800 transition-all duration-300 hover:-translate-y-1 cursor-pointer flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="text-2xl">🥇</span>
+                            <span class="text-[10px] font-tech uppercase px-2 py-0.5 rounded bg-rose-500/10 text-rose-400 border border-rose-500/20">Avansat</span>
+                        </div>
+                        <div class="font-tech text-xl font-bold text-cyan-400 group-hover:text-cyan-300">Reducere 15%</div>
+                    </div>
+                    <div class="text-xs text-slate-400 mt-4 space-y-1.5 border-t border-slate-700/50 pt-3">
+                        <p>• 10 întrebări (MK Tech & IT)</p>
+                        <p>• 25 secunde / întrebare</p>
+                        <p class="text-slate-300 font-medium">• Prag minim: 8 corecte</p>
+                    </div>
+                </button>
+            </div>
+
+            <div class="flex items-center justify-center pt-2 border-t border-slate-800/80 text-xs text-slate-500">
+                <span>⚠️ Ai la dispoziție o singură încercare pentru cupon!</span>
+            </div>
+        </div>
+
+        <div id="quiz-screen" class="hidden bg-slate-900/90 border border-slate-800 rounded-2xl p-6 md:p-8 backdrop-blur-xl shadow-2xl neon-glow animate-fade">
+            <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden mb-5">
+                <div id="quiz-progress-bar" class="bg-cyan-400 h-full transition-all duration-300" style="width: 20%"></div>
+            </div>
+
+            <div class="flex justify-between items-center mb-4 pb-4 border-b border-slate-800">
+                <div>
+                    <span id="quiz-level-badge" class="text-xs font-tech uppercase tracking-wider text-cyan-400 bg-cyan-950/50 px-2.5 py-1 rounded-md border border-cyan-800/40">Nivel</span>
+                    <h3 class="text-sm text-slate-400 mt-1.5">Întrebarea <span id="current-q-num" class="text-white font-bold">1</span> din <span id="total-q-num" class="text-white font-bold">5</span></h3>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button id="hint-btn" onmouseenter="SoundFX.hover()" onclick="useHint()" class="text-xs bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 border border-amber-500/30 px-3 py-1.5 rounded-lg transition font-medium cursor-pointer">
+                        💡 50/50 (1)
+                    </button>
+                    <div id="timer-box" class="flex items-center gap-2 bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-700 transition-colors">
+                        <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <span id="timer-display" class="font-tech font-bold text-cyan-400 w-5 text-right">30</span><span class="text-xs text-slate-400">s</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-6">
+                <h4 id="question-text" class="text-lg md:text-xl font-semibold text-white leading-relaxed">Se încarcă întrebarea...</h4>
+            </div>
+
+            <div id="options-container" class="space-y-3 mb-6"></div>
+
+            <div id="explanation-box" class="hidden p-4 rounded-xl bg-slate-800/90 border border-slate-700 text-sm text-slate-300 mb-6 animate-fade">
+                <span id="feedback-status" class="font-tech font-bold text-xs uppercase tracking-wider block mb-1"></span>
+                <p id="explanation-text" class="text-slate-300 leading-relaxed"></p>
+            </div>
+
+            <button id="next-btn" onmouseenter="SoundFX.hover()" onclick="nextQuestion()" class="hidden w-full py-3.5 px-6 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-tech font-bold rounded-xl transition duration-200 shadow-lg shadow-cyan-500/20 cursor-pointer">
+                Următoarea Întrebare →
+            </button>
+        </div>
+
+        <div id="result-screen" class="hidden bg-slate-900/90 border border-slate-800 rounded-2xl p-6 md:p-8 backdrop-blur-xl shadow-2xl text-center neon-glow animate-fade">
+            <div id="result-icon" class="text-5xl mb-4 select-none inline-block" title="MK Tech Quiz">🎉</div>
+            <h3 id="result-title" class="font-tech text-2xl md:text-3xl font-extrabold text-white mb-2">Felicitări!</h3>
+            <p id="result-subtitle" class="text-slate-400 text-sm mb-6">Ai trecut testul cu succes.</p>
+
+            <div id="coupon-card" class="hidden p-6 rounded-2xl bg-gradient-to-br from-slate-800 to-slate-900 border border-cyan-500/40 mb-6 relative overflow-hidden">
+                <div class="absolute -right-10 -bottom-10 w-32 h-32 bg-cyan-500/10 rounded-full blur-2xl pointer-events-none"></div>
+                <p id="coupon-label" class="text-xs uppercase font-tech text-cyan-400 tracking-wider mb-2">Cupon Criptat MK Tech</p>
+                
+                <div class="flex items-center justify-center gap-3 my-3">
+                    <div id="coupon-code" class="font-mono-tech text-2xl md:text-3xl font-bold text-white tracking-widest bg-slate-950/80 px-5 py-2.5 rounded-xl border border-cyan-500/30 select-all shadow-inner">MK05-XXXX</div>
+                    <button onmouseenter="SoundFX.hover()" onclick="copyCoupon()" id="copy-btn" class="px-3.5 py-3 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 text-cyan-300 text-xs font-medium transition cursor-pointer">
+                        📋 Copiază
+                    </button>
+                </div>
+
+                <p class="text-xs text-slate-400">Codul conține o cheie matematică unică. Introdu-l la finalizarea comenzii pe site-ul MK Tech!</p>
+            </div>
+
+            <div id="score-summary" class="bg-slate-800/50 border border-slate-700/50 rounded-xl p-4 text-sm text-slate-300 mb-6">
+                Scor obținut: <span id="final-score" class="font-bold text-white">0</span> răspunsuri corecte.
+            </div>
+
+            <a id="store-link" onmouseenter="SoundFX.hover()" onclick="SoundFX.click()" href="https://pixelcraft-fo.github.io/MKTech/index.html" target="_blank" class="inline-block w-full py-3.5 px-6 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-tech font-bold rounded-xl transition duration-200 shadow-lg shadow-cyan-500/20 cursor-pointer text-center">
+                Folosește cuponul pe site-ul MK Tech ↗
+            </a>
+        </div>
+
+    </div>
+
+    <script>
+        const SoundFX = {
+            ctx: null,
+
+            init() {
+                if (!this.ctx) {
+                    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                    if (AudioCtx) {
+                        this.ctx = new AudioCtx();
+                    }
+                }
+                if (this.ctx && this.ctx.state === 'suspended') {
+                    this.ctx.resume().catch(() => {});
+                }
+            },
+
+            tone(freq, type = 'sine', duration = 0.1, vol = 0.08, slideTo = null) {
+                this.init();
+                if (!this.ctx) return;
+
+                const playNote = () => {
+                    const now = this.ctx.currentTime;
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+
+                    osc.type = type;
+                    osc.frequency.setValueAtTime(freq, now);
+                    if (slideTo) {
+                        osc.frequency.exponentialRampToValueAtTime(slideTo, now + duration);
+                    }
+
+                    gain.gain.setValueAtTime(0.0001, now);
+                    gain.gain.linearRampToValueAtTime(vol, now + 0.01);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+
+                    osc.start(now);
+                    osc.stop(now + duration + 0.02);
+                };
+
+                if (this.ctx.state === 'suspended') {
+                    this.ctx.resume().then(playNote).catch(() => {});
+                } else {
+                    playNote();
+                }
+            },
+
+            hover() {
+                this.tone(920, 'sine', 0.04, 0.025, 1150);
+            },
+
+            click() {
+                this.tone(520, 'triangle', 0.07, 0.08, 880);
+            },
+
+            introPulse() {
+                this.tone(110, 'sine', 0.55, 0.12, 260);
+                setTimeout(() => this.tone(660, 'triangle', 0.35, 0.06, 1320), 90);
+            },
+
+            introCollapse() {
+                this.tone(480, 'sine', 0.25, 0.06, 140);
+            },
+
+            bootBlip(stepIdx = 0) {
+                const baseFreq = 420 + (stepIdx * 85);
+                this.tone(baseFreq, 'sine', 0.06, 0.05, baseFreq + 160);
+            },
+
+            bootComplete() {
+                [523.25, 659.25, 783.99, 1046.5].forEach((f, idx) => {
+                    setTimeout(() => this.tone(f, 'triangle', 0.25, 0.07), idx * 75);
+                });
+            },
+
+            correct() {
+                this.tone(587.33, 'triangle', 0.12, 0.09);
+                setTimeout(() => this.tone(880, 'triangle', 0.28, 0.11, 920), 95);
+            },
+
+            wrong() {
+                this.tone(220, 'sawtooth', 0.18, 0.07, 160);
+                setTimeout(() => this.tone(155, 'sawtooth', 0.32, 0.08, 115), 140);
+            },
+
+            hint() {
+                this.tone(440, 'sine', 0.12, 0.07, 880);
+                setTimeout(() => this.tone(880, 'sine', 0.18, 0.08, 1320), 100);
+            },
+
+            timerTick(urgent = false) {
+                if (urgent) {
+                    this.tone(880, 'square', 0.06, 0.05, 660);
+                } else {
+                    this.tone(600, 'sine', 0.025, 0.015);
+                }
+            },
+
+            win() {
+                const notes = [523.25, 659.25, 783.99, 1046.50, 1318.51];
+                notes.forEach((n, i) => {
+                    setTimeout(() => this.tone(n, 'triangle', 0.28, 0.09), i * 95);
+                });
+            },
+
+            lose() {
+                const notes = [392.00, 349.23, 329.63, 261.63];
+                notes.forEach((n, i) => {
+                    setTimeout(() => this.tone(n, 'sawtooth', 0.25, 0.06), i * 130);
+                });
+            }
+        };
+
+        SoundFX.init();
+        ['pointermove', 'pointerdown', 'mousemove', 'mousedown', 'touchstart', 'keydown', 'click'].forEach(evt => {
+            window.addEventListener(evt, () => SoundFX.init(), { passive: true });
+        });
+
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.vx = (Math.random() - 0.5) * 0.7;
+                this.vy = (Math.random() - 0.5) * 0.7;
+                this.radius = Math.random() * 1.8 + 0.8;
+            }
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+                if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+            }
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(34, 211, 238, 0.6)';
+                ctx.fill();
+            }
+        }
+
+        function initParticles() {
+            particles = [];
+            const count = Math.min(Math.floor((window.innerWidth * window.innerHeight) / 18000), 65);
+            for (let i = 0; i < count; i++) particles.push(new Particle());
+        }
+        initParticles();
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].update();
+                particles[i].draw();
+                for (let j = i + 1; j < particles.length; j++) {
+                    const dx = particles[i].x - particles[j].x;
+                    const dy = particles[i].y - particles[j].y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < 130) {
+                        ctx.beginPath();
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.strokeStyle = `rgba(6, 182, 212, ${0.18 * (1 - dist / 130)})`;
+                        ctx.lineWidth = 1;
+                        ctx.stroke();
+                    }
+                }
+            }
+            requestAnimationFrame(animateParticles);
+        }
+        animateParticles();
+
+        function scrambleText(element, finalString, duration = 700) {
+            const chars = "01#$X@%&*<>MKTECH";
+            const steps = 18;
+            let currentStep = 0;
+            const interval = setInterval(() => {
+                currentStep++;
+                const progress = currentStep / steps;
+                const revealedCount = Math.floor(progress * finalString.length);
+                let output = "";
+                for (let i = 0; i < finalString.length; i++) {
+                    if (finalString[i] === " ") {
+                        output += " ";
+                    } else if (i < revealedCount) {
+                        output += finalString[i];
+                    } else {
+                        output += chars[Math.floor(Math.random() * chars.length)];
+                    }
+                }
+                element.textContent = output;
+                if (currentStep >= steps) {
+                    clearInterval(interval);
+                    element.textContent = finalString;
+                }
+            }, duration / steps);
+        }
+
+        function spawnShockwave() {
+            const container = document.getElementById('shockwave-container');
+            const ring = document.createElement('div');
+            ring.className = 'shockwave-ring';
+            container.appendChild(ring);
+            setTimeout(() => ring.remove(), 850);
+        }
+
+        function runIntroSplash(onComplete) {
+            const splash = document.getElementById('intro-splash');
+            const dot = document.getElementById('intro-dot');
+            const text1 = document.getElementById('intro-text-1');
+
+            setTimeout(() => {
+                dot.classList.add('dot-appear');
+                spawnShockwave();
+                SoundFX.introPulse();
+            }, 150);
+
+            setTimeout(() => {
+                dot.classList.add('dot-line');
+            }, 500);
+
+            setTimeout(() => {
+                dot.style.opacity = '0';
+                text1.classList.add('stage-active');
+                spawnShockwave();
+            }, 800);
+
+            setTimeout(() => {
+                text1.classList.remove('stage-active');
+                text1.classList.add('stage-exit');
+                dot.className = 'absolute dot-collapse';
+                dot.style.opacity = '1';
+                SoundFX.introCollapse();
+            }, 2200);
+
+            setTimeout(() => {
+                dot.className = 'absolute dot-burst';
+                splash.classList.add('opacity-0', 'pointer-events-none');
+                if (onComplete) onComplete();
+            }, 2600);
+
+            setTimeout(() => {
+                splash.classList.add('hidden');
+            }, 3200);
+        }
+
+        const allQuestions = {
+            easy: [
+                {
+                    q: "Cu ce dispozitiv miști săgeata (cursorul) și dai click pe ecranul calculatorului?",
+                    options: ["Cu tastatura", "Cu mouse-ul", "Cu imprimanta", "Cu boxele"],
+                    correct: 1,
+                    explanation: "Mouse-ul este perifericul de bază cu care navigăm și selectăm elemente pe ecran."
+                },
+                {
+                    q: "La ce folosește o imprimantă într-un birou?",
+                    options: ["La răcirea calculatorului", "La scoaterea documentelor și pozelor pe hârtie", "La ascultarea muzicii", "La creșterea vitezei de internet"],
+                    correct: 1,
+                    explanation: "Imprimanta transpune documentele digitale din calculator direct pe coli de hârtie."
+                },
+                {
+                    q: "Care este marele avantaj al unui laptop față de un calculator obișnuit (desktop)?",
+                    options: ["Este portabil și are baterie proprie, putând fi luat oriunde", "Nu are nevoie niciodată de curent", "Are un ecran de 2 metri", "Funcționează doar sub apă"],
+                    correct: 0,
+                    explanation: "Laptopul integrează ecranul, tastatura și bateria într-un singur dispozitiv ușor de transportat."
+                },
+                {
+                    q: "Ce piesă este considerată „creierul” calculatorului, care face toate calculele?",
+                    options: ["Carcasa", "Procesorul (CPU)", "Mousepad-ul", "Cablul de priză"],
+                    correct: 1,
+                    explanation: "Procesorul (CPU) este componenta centrală care procesează toate comenzile și programele."
+                },
+                {
+                    q: "Ce dispozitiv folosești pentru a scrie texte, litere și cifre pe calculator?",
+                    options: ["Tastatura", "Boxele", "Monitorul", "Mousepad-ul"],
+                    correct: 0,
+                    explanation: "Tastatura conține tastele cu litere, cifre și simboluri necesare pentru redactarea documentelor."
+                }
+            ],
+            medium: [
+                {
+                    q: "De ce este mai bun un SSD față de un Hard Disk (HDD) vechi într-un PC sau laptop?",
+                    options: ["Face calculatorul și programele să se încarce mult mai repede", "Schimbă culoarea ecranului", "Mărește diagonala monitorului", "Înlocuiește placa de rețea"],
+                    correct: 0,
+                    explanation: "SSD-ul folosește memorie rapidă fără piese în mișcare, pornind Windows-ul și aplicațiile în câteva secunde."
+                },
+                {
+                    q: "În ce oraș își desfășoară activitatea Firma de Exercițiu MK Tech S.R.L.?",
+                    options: ["Focșani", "Cluj-Napoca", "Constanța", "Timișoara"],
+                    correct: 0,
+                    explanation: "MK Tech S.R.L. a fost înființată și funcționează în Focșani, la Colegiul Economic „Mihail Kogălniceanu”."
+                },
+                {
+                    q: "Ce îți permite să faci tehnologia Wi-Fi într-un birou sau acasă?",
+                    options: ["Să te conectezi la internet fără cabluri (wireless)", "Să printezi foi fără hârtie", "Să încarci telefonul fără priză de la 10 metri", "Să cureți praful din tastatură"],
+                    correct: 0,
+                    explanation: "Un router Wi-Fi transmite semnalul de internet prin unde radio către laptopuri și telefoane."
+                },
+                {
+                    q: "Cu ce se ocupă firma noastră de exercițiu, F.E. MK Tech S.R.L.?",
+                    options: ["Comercializarea de calculatoare, laptopuri, periferice și produse de birotică", "Vânzarea de haine și încălțăminte sport", "Agenție de turism și vacanțe exotice", "Service pentru biciclete"],
+                    correct: 0,
+                    explanation: "MK Tech S.R.L. este magazinul tău dedicat echipamentelor IT, PC-urilor și produselor de birotică!"
+                },
+                {
+                    q: "Ce rol are memoria RAM într-un calculator?",
+                    options: ["Ajută calculatorul să țină mai multe aplicații și tab-uri deschise simultan fără să se blocheze", "Răcește placa video", "Produce sunetul în căști", "Trimite documente la imprimantă"],
+                    correct: 0,
+                    explanation: "Memoria RAM păstrează temporar datele programelor pe care le folosești în acel moment."
+                },
+                {
+                    q: "Ce cablu folosești cel mai des ca să conectezi un calculator sau laptop la un monitor modern sau televizor?",
+                    options: ["Cablu HDMI (sau DisplayPort)", "Cablu de telefon fix", "Cablu audio Jack", "Cablu de imprimantă veche"],
+                    correct: 0,
+                    explanation: "HDMI și DisplayPort transmit atât imagine de înaltă rezoluție, cât și sunet printr-un singur cablu."
+                },
+                {
+                    q: "Dacă vrei să vorbești cu colegii într-un apel video pe PC, de ce periferice ai nevoie?",
+                    options: ["Cameră web (Webcam) și microfon / căști", "Doar de un cablu HDMI", "Un scanner și un laminator", "Un stick USB gol"],
+                    correct: 0,
+                    explanation: "Camera web preia imaginea video, iar microfonul și căștile asigură comunicarea audio."
+                }
+            ],
+            hard: [
+                {
+                    q: "La ce liceu a luat naștere Firma de Exercițiu F.E. MK Tech S.R.L.?",
+                    options: ["Colegiul Economic „Mihail Kogălniceanu” din Focșani", "Colegiul Național „Unirea”", "Liceul de Arte", "Colegiul Tehnic Auto"],
+                    correct: 0,
+                    explanation: "Numele MK Tech provine chiar de la inițialele Colegiului Economic „Mihail Kogălniceanu” din Focșani!"
+                },
+                {
+                    q: "În ce an a fost înființată inițial firma de exercițiu MK Tech S.R.L.?",
+                    options: ["2012", "2005", "2020", "2025"],
+                    correct: 0,
+                    explanation: "F.E. MK Tech S.R.L. are o tradiție frumoasă, fiind înființată în anul 2012."
+                },
+                {
+                    q: "Care este diferența principală dintre un SSD de tip M.2 NVMe și un SSD clasic SATA III?",
+                    options: ["SSD-ul NVMe comunică direct prin magistrala PCIe, atingând viteze de câteva ori mai mari", "SSD-ul NVMe folosește discuri magnetice rotative", "SSD-ul SATA III se montează direct în procesor", "Nu există nicio diferență de viteză, doar de dimensiune"],
+                    correct: 0,
+                    explanation: "Tehnologia NVMe folosește liniile PCI Express ale plăcii de bază, depășind limita de ~550 MB/s a conexiunii SATA și ajungând la mii de MB/s."
+                },
+                {
+                    q: "Din ce clasă fac parte elevii care conduc în prezent MK Tech S.R.L.?",
+                    options: ["Clasa a XI-a A", "Clasa a IX-a C", "Clasa a X-a B", "Clasa a XII-a E"],
+                    correct: 0,
+                    explanation: "Actuala echipă de management a MK Tech este formată din elevii clasei a XI-a A."
+                },
+                {
+                    q: "Ce componentă din calculator este cea mai importantă pentru jocuri video și editare grafică?",
+                    options: ["Placa video (GPU)", "Placa de sunet", "Unitatea DVD", "Cablu de rețea"],
+                    correct: 0,
+                    explanation: "Placa video (Graphics Processing Unit) procesează imaginile 3D, cadrele pe secundă (FPS) și efectele vizuale."
+                },
+                {
+                    q: "Care este promisiunea (misiunea) MK Tech S.R.L. pentru clienții săi?",
+                    options: ["Echipamente IT și birotică de calitate la prețuri corecte", "Cele mai scumpe produse de pe piață", "Livrare doar peste 5 ani", "Vânzarea exclusivă de televizoare alb-negru"],
+                    correct: 0,
+                    explanation: "Misiunea MK Tech pune pe primul loc raportul excelent calitate-preț și satisfacția partenerilor."
+                },
+                {
+                    q: "Ce înseamnă rata de refresh de „144Hz” la un monitor din oferta MK Tech?",
+                    options: ["Imaginea se împrospătează de 144 de ori pe secundă, oferind o mișcare foarte fluidă", "Monitorul consumă 144 de kilowați pe oră", "Monitorul cântărește 144 de grame", "Are 144 de butoane pe spate"],
+                    correct: 0,
+                    explanation: "Cu cât numărul de Hertzi (Hz) este mai mare, cu atât mișcarea cursorului și a jocurilor pe ecran este mai lină."
+                },
+                {
+                    q: "Ce rol are Sursa de Alimentare (PSU) într-o unitate PC?",
+                    options: ["Preia curentul din priză și îl distribuie în siguranță către toate piesele calculatorului", "Păstrează pozele din vacanță", "Crește viteza de descărcare de pe internet", "Curăță virușii din sistem"],
+                    correct: 0,
+                    explanation: "Sursa transformă curentul alternativ din priză în curent continuu stabil pentru placa de bază, procesor și placa video."
+                },
+                {
+                    q: "De ce este recomandat să montezi două plăcuțe de memorie RAM (ex: 2x8 GB) în loc de una singură (1x16 GB) pe placa de bază?",
+                    options: ["Pentru a activa modul Dual-Channel, care dublează lățimea de bandă dintre RAM și procesor", "Pentru a reduce consumul sursei de alimentare la jumătate", "Pentru că o singură plăcuță nu poate rula sistemul de operare", "Pentru a mări rezoluția maximă a monitorului"],
+                    correct: 0,
+                    explanation: "Configurația Dual-Channel permite procesorului să comunice cu ambele module RAM simultan, oferind performanță mai bună și FPS-uri mai stabile."
+                },
+                {
+                    q: "Ce aparat de birotică este ideal atunci când ai nevoie și de imprimantă, și de scanner, și de copiator (xerox) într-un singur loc?",
+                    options: ["O imprimantă multifuncțională", "Un distrugător de documente", "Un videoproiector", "Un laminator de foi"],
+                    correct: 0,
+                    explanation: "Multifuncționalele combină printarea, scanarea și copierea documentelor într-un singur echipament compact pentru birou."
+                }
+            ]
+        };
+
+        function generateSecureCoupon(level) {
+            const chars = "23456789ABCDEFGHJKLMNPQRSTUVWXYZ";
+            let discount = 5;
+            let prefix = "MK05";
+
+            if (level === 'easy') { discount = 5; prefix = "MK05"; }
+            else if (level === 'medium') { discount = 10; prefix = "MK10"; }
+            else if (level === 'hard') { discount = 15; prefix = "MK15"; }
+
+            const c1 = chars[Math.floor(Math.random() * chars.length)];
+            const c2 = chars[Math.floor(Math.random() * chars.length)];
+            const c3 = chars[Math.floor(Math.random() * chars.length)];
+
+            const mathSum = (c1.charCodeAt(0) * 3) + (c2.charCodeAt(0) * 7) + (c3.charCodeAt(0) * 11) + discount;
+            const checkChar = chars[mathSum % chars.length];
+
+            return `${prefix}-${c1}${c2}${c3}${checkChar}`;
+        }
+
+        const bootSteps = [
+            { at: 12, text: "Montare nucleu grafic & arhitectură MK_OS...", status: "OK", sec: "FIREWALL ON" },
+            { at: 28, text: "Conectare nod Colegiul Economic M.K. Focșani...", status: "SYNCED", sec: "TLS 1.3" },
+            { at: 46, text: "Încărcare stocuri birotică, unități PC & periferice...", status: "OK", sec: "DB READY" },
+            { at: 65, text: "Anomalie detectată: Alex a fost pe aici...", status: "BYPASS", sec: "ALEX_OK" },
+            { at: 84, text: "Inițializare generator matematic cupoane (ASCII-Mod32)...", status: "ACTIVE", sec: "ENCRYPTED" },
+            { at: 98, text: "Toate sistemele sunt verzi. Lansare interfață!", status: "READY", sec: "UNLOCKED" }
+        ];
+
+        const levelNames = {
+            easy: "Ușor (5%)",
+            medium: "Mediu (10%)",
+            hard: "Avansat (15%)"
+        };
+
+        let currentLevel = '';
+        let questionsList = [];
+        let currentIndex = 0;
+        let score = 0;
+        let timer = null;
+        let timeLeft = 30;
+        let hintUsed = false;
+        let isQuestionAnswered = false;
+        let requiredCorrect = 3;
+        let questionTimeLimit = 30;
+
+        function shuffleArray(arr) {
+            const copy = [...arr];
+            for (let i = copy.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [copy[i], copy[j]] = [copy[j], copy[i]];
+            }
+            return copy;
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            SoundFX.init();
+            const savedData = localStorage.getItem('mktech_quiz_state');
+            runIntroSplash(() => {
+                if (savedData) {
+                    showAlreadyPlayedScreen(JSON.parse(savedData));
+                    return;
+                }
+                const loadScreen = document.getElementById('loading-screen');
+                loadScreen.classList.remove('opacity-0', 'scale-95');
+                loadScreen.classList.add('opacity-100', 'scale-100');
+                runBootSequence();
+            });
+        });
+
+        function runBootSequence() {
+            const logsContainer = document.getElementById('boot-logs');
+            const bootBar = document.getElementById('boot-bar');
+            const bootPercent = document.getElementById('boot-percent');
+            const metricRam = document.getElementById('metric-ram');
+            const metricSec = document.getElementById('metric-sec');
+            const statusBadge = document.getElementById('status-badge');
+            const coreSubtext = document.getElementById('core-subtext');
+            const coreGlow = document.getElementById('core-glow');
+            const innerRing = document.getElementById('inner-ring');
+            const titleEl = document.getElementById('scramble-title');
+
+            logsContainer.innerHTML = '';
+            bootBar.style.width = '0%';
+            bootPercent.textContent = '00%';
+            bootPercent.className = "font-tech text-2xl md:text-3xl font-black text-white text-glow-cyan tracking-tight";
+            coreSubtext.textContent = "SYNCING";
+            coreSubtext.className = "font-mono-tech text-[9px] uppercase tracking-widest text-cyan-400 mt-0.5";
+            coreGlow.className = "absolute w-36 h-36 bg-cyan-500/20 rounded-full blur-2xl pointer-events-none transition-colors duration-500";
+            innerRing.classList.replace('text-emerald-400', 'text-cyan-300');
+            statusBadge.textContent = "BOOTING";
+            statusBadge.className = "text-cyan-400 bg-cyan-950/80 px-2.5 py-0.5 rounded border border-cyan-700/50";
+
+            scrambleText(titleEl, "MK TECH S.R.L.", 900);
+
+            let triggeredSteps = new Set();
+            const totalDuration = 3400;
+            const startTime = performance.now();
+
+            function updateFrame(now) {
+                const elapsed = now - startTime;
+                const rawProgress = Math.min(elapsed / totalDuration, 1);
+                const eased = 1 - Math.pow(1 - rawProgress, 2.2);
+                const pct = Math.floor(eased * 100);
+
+                bootPercent.textContent = pct < 10 ? `0${pct}%` : `${pct}%`;
+                bootBar.style.width = `${pct}%`;
+
+                const ramVal = Math.min(32, Math.floor((pct / 100) * 32));
+                metricRam.textContent = `${ramVal} / 32 GB`;
+                const ghz = (4.1 + (Math.sin(now / 120) * 0.45)).toFixed(2);
+                document.getElementById('telemetry-clock').textContent = `CORE: ${ghz} GHz`;
+
+                bootSteps.forEach((step, idx) => {
+                    if (pct >= step.at && !triggeredSteps.has(idx)) {
+                        triggeredSteps.add(idx);
+                        metricSec.textContent = step.sec;
+                        SoundFX.bootBlip(idx);
+
+                        const line = document.createElement('div');
+                        line.className = "flex justify-between items-center animate-fade";
+                        const badgeColor = step.status === 'BYPASS' ? 'text-amber-400' : 'text-emerald-400';
+                        line.innerHTML = `
+                            <span class="truncate pr-2"><span class="text-cyan-400 mr-1.5">&gt;</span>${step.text}</span>
+                            <span class="${badgeColor} font-bold shrink-0">[${step.status}]</span>
+                        `;
+                        logsContainer.appendChild(line);
+                        logsContainer.scrollTop = logsContainer.scrollHeight;
+                    }
+                });
+
+                if (rawProgress < 1) {
+                    requestAnimationFrame(updateFrame);
+                } else {
+                    bootPercent.textContent = "100%";
+                    bootPercent.className = "font-tech text-2xl md:text-3xl font-black text-emerald-300 text-glow-emerald tracking-tight";
+                    coreSubtext.textContent = "GRANTED";
+                    coreSubtext.className = "font-mono-tech text-[9px] uppercase tracking-widest text-emerald-400 mt-0.5 font-bold";
+                    coreGlow.className = "absolute w-40 h-40 bg-emerald-500/30 rounded-full blur-2xl pointer-events-none transition-colors duration-500";
+                    innerRing.classList.replace('text-cyan-300', 'text-emerald-400');
+                    statusBadge.textContent = "ACCESS GRANTED";
+                    statusBadge.className = "text-emerald-300 bg-emerald-950/90 px-2.5 py-0.5 rounded border border-emerald-500/60 font-bold";
+                    document.getElementById('loading-screen').classList.replace('neon-glow', 'neon-glow-emerald');
+
+                    SoundFX.bootComplete();
+                    scrambleText(titleEl, "SISTEM DEBLOCAT", 450);
+
+                    setTimeout(() => {
+                        document.getElementById('loading-screen').classList.add('hidden');
+                        document.getElementById('level-screen').classList.remove('hidden');
+                    }, 750);
+                }
+            }
+
+            requestAnimationFrame(updateFrame);
+        }
+
+        function showAlreadyPlayedScreen(state) {
+            document.getElementById('loading-screen').classList.add('hidden');
+            document.getElementById('level-screen').classList.add('hidden');
+            document.getElementById('quiz-screen').classList.add('hidden');
+
+            const resScreen = document.getElementById('result-screen');
+            resScreen.classList.remove('hidden');
+
+            document.getElementById('final-score').textContent = state.scoreText || 'N/A';
+
+            if (state.hasWon && state.couponCode) {
+                document.getElementById('result-icon').textContent = '🎟️';
+                document.getElementById('result-title').textContent = 'Ai jucat deja acest quiz!';
+                document.getElementById('result-subtitle').textContent = 'Mai jos găsești cuponul criptat pe care l-ai câștigat anterior:';
+                document.getElementById('coupon-code').textContent = state.couponCode;
+                document.getElementById('coupon-label').textContent = `Cupon Reducere (${state.discount || ''})`;
+                document.getElementById('coupon-card').classList.remove('hidden');
+                document.getElementById('store-link').textContent = 'Folosește cuponul pe site-ul MK Tech ↗';
+            } else {
+                document.getElementById('result-icon').textContent = '⚠️';
+                document.getElementById('result-title').textContent = 'Acces Restricționat';
+                document.getElementById('result-subtitle').textContent = 'Ai utilizat deja încercarea ta unică pentru acest quiz.';
+                document.getElementById('coupon-card').classList.add('hidden');
+                document.getElementById('store-link').textContent = 'Mergi pe site-ul MK Tech ↗';
+            }
+        }
+
+        function startQuiz(level) {
+            SoundFX.click();
+            currentLevel = level;
+            hintUsed = false;
+
+            const hintBtn = document.getElementById('hint-btn');
+            hintBtn.disabled = false;
+            hintBtn.classList.remove('opacity-40', 'cursor-not-allowed');
+            hintBtn.textContent = '💡 50/50 (1)';
+
+            if (level === 'easy') {
+                requiredCorrect = 3;
+                questionTimeLimit = 30;
+            } else if (level === 'medium') {
+                requiredCorrect = 5;
+                questionTimeLimit = 30;
+            } else if (level === 'hard') {
+                requiredCorrect = 8;
+                questionTimeLimit = 25;
+            }
+
+            questionsList = shuffleArray(allQuestions[level]).map(item => {
+                const optionsWithFlags = item.options.map((text, idx) => ({
+                    text,
+                    isCorrect: idx === item.correct
+                }));
+                const shuffledOptions = shuffleArray(optionsWithFlags);
+                return {
+                    q: item.q,
+                    options: shuffledOptions.map(o => o.text),
+                    correct: shuffledOptions.findIndex(o => o.isCorrect),
+                    explanation: item.explanation
+                };
+            });
+
+            currentIndex = 0;
+            score = 0;
+
+            document.getElementById('level-screen').classList.add('hidden');
+            document.getElementById('quiz-screen').classList.remove('hidden');
+            document.getElementById('total-q-num').textContent = questionsList.length;
+            document.getElementById('quiz-level-badge').textContent = `Nivel: ${levelNames[level]}`;
+
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            if (currentIndex >= questionsList.length) {
+                endQuiz();
+                return;
+            }
+
+            isQuestionAnswered = false;
+            clearInterval(timer);
+            timeLeft = questionTimeLimit;
+            updateTimerStyle();
+
+            const progressPercent = ((currentIndex + 1) / questionsList.length) * 100;
+            document.getElementById('quiz-progress-bar').style.width = `${progressPercent}%`;
+
+            const qData = questionsList[currentIndex];
+            document.getElementById('current-q-num').textContent = currentIndex + 1;
+            document.getElementById('question-text').textContent = qData.q;
+            document.getElementById('explanation-box').classList.add('hidden');
+            
+            const nextBtn = document.getElementById('next-btn');
+            nextBtn.classList.add('hidden');
+            nextBtn.textContent = (currentIndex === questionsList.length - 1) ? 'Vezi Rezultatul Final →' : 'Următoarea Întrebare →';
+
+            const optionsContainer = document.getElementById('options-container');
+            optionsContainer.innerHTML = '';
+
+            const letters = ['A', 'B', 'C', 'D'];
+            qData.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "w-full text-left p-4 rounded-xl bg-slate-800/60 border border-slate-700/60 hover:border-cyan-500 hover:bg-slate-800 transition duration-200 text-slate-200 font-medium cursor-pointer option-btn flex items-center gap-3";
+                btn.innerHTML = `<span class="font-tech text-xs font-bold px-2.5 py-1 rounded bg-slate-700/80 text-cyan-400 shrink-0">${letters[idx]}</span> <span>${opt}</span>`;
+                btn.onmouseenter = () => { if (!btn.disabled) SoundFX.hover(); };
+                btn.onclick = () => selectAnswer(idx, qData.correct);
+                optionsContainer.appendChild(btn);
+            });
+
+            timer = setInterval(() => {
+                timeLeft--;
+                updateTimerStyle();
+                if (timeLeft > 0) {
+                    SoundFX.timerTick(timeLeft <= 5);
+                }
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    handleTimeout(qData.correct);
+                }
+            }, 1000);
+        }
+
+        function updateTimerStyle() {
+            const timerDisplay = document.getElementById('timer-display');
+            const timerBox = document.getElementById('timer-box');
+            timerDisplay.textContent = timeLeft;
+
+            if (timeLeft <= 5) {
+                timerDisplay.classList.replace('text-cyan-400', 'text-rose-400');
+                timerBox.classList.replace('border-slate-700', 'border-rose-500/60');
+            } else {
+                timerDisplay.classList.replace('text-rose-400', 'text-cyan-400');
+                timerBox.classList.replace('border-rose-500/60', 'border-slate-700');
+            }
+        }
+
+        function selectAnswer(selectedIndex, correctIndex) {
+            if (isQuestionAnswered) return;
+            isQuestionAnswered = true;
+            clearInterval(timer);
+
+            const buttons = document.querySelectorAll('.option-btn');
+            buttons.forEach((btn, idx) => {
+                btn.disabled = true;
+                btn.classList.remove('hover:border-cyan-500', 'hover:bg-slate-800', 'cursor-pointer');
+                if (idx === correctIndex) {
+                    btn.classList.remove('bg-slate-800/60', 'border-slate-700/60');
+                    btn.classList.add('bg-emerald-500/20', 'border-emerald-500', 'text-emerald-300');
+                } else if (idx === selectedIndex && idx !== correctIndex) {
+                    btn.classList.remove('bg-slate-800/60', 'border-slate-700/60');
+                    btn.classList.add('bg-rose-500/20', 'border-rose-500', 'text-rose-300');
+                }
+            });
+
+            const statusEl = document.getElementById('feedback-status');
+            if (selectedIndex === correctIndex) {
+                score++;
+                SoundFX.correct();
+                statusEl.textContent = "✓ Răspuns Corect — Info MK Tech:";
+                statusEl.className = "font-tech font-bold text-xs uppercase tracking-wider block mb-1 text-emerald-400";
+            } else {
+                SoundFX.wrong();
+                statusEl.textContent = "✕ Răspuns Greșit — Info MK Tech:";
+                statusEl.className = "font-tech font-bold text-xs uppercase tracking-wider block mb-1 text-rose-400";
+            }
+
+            showExplanation();
+        }
+
+        function handleTimeout(correctIndex) {
+            if (isQuestionAnswered) return;
+            isQuestionAnswered = true;
+            SoundFX.wrong();
+
+            const buttons = document.querySelectorAll('.option-btn');
+            buttons.forEach((btn, idx) => {
+                btn.disabled = true;
+                btn.classList.remove('hover:border-cyan-500', 'hover:bg-slate-800', 'cursor-pointer');
+                if (idx === correctIndex) {
+                    btn.classList.remove('bg-slate-800/60', 'border-slate-700/60');
+                    btn.classList.add('bg-emerald-500/20', 'border-emerald-500', 'text-emerald-300');
+                }
+            });
+
+            const statusEl = document.getElementById('feedback-status');
+            statusEl.textContent = "⏰ Timpul a expirat! Răspunsul corect era cel marcat:";
+            statusEl.className = "font-tech font-bold text-xs uppercase tracking-wider block mb-1 text-amber-400";
+
+            showExplanation();
+        }
+
+        function showExplanation() {
+            const qData = questionsList[currentIndex];
+            document.getElementById('explanation-text').textContent = qData.explanation;
+            document.getElementById('explanation-box').classList.remove('hidden');
+            document.getElementById('next-btn').classList.remove('hidden');
+        }
+
+        function useHint() {
+            if (hintUsed || isQuestionAnswered) return;
+            hintUsed = true;
+            SoundFX.hint();
+
+            const hintBtn = document.getElementById('hint-btn');
+            hintBtn.disabled = true;
+            hintBtn.classList.add('opacity-40', 'cursor-not-allowed');
+            hintBtn.textContent = '💡 50/50 (0)';
+
+            const qData = questionsList[currentIndex];
+            const buttons = document.querySelectorAll('.option-btn');
+
+            const wrongIndices = [0, 1, 2, 3].filter(idx => idx !== qData.correct);
+            const toEliminate = shuffleArray(wrongIndices).slice(0, 2);
+
+            toEliminate.forEach(idx => {
+                buttons[idx].style.opacity = '0.25';
+                buttons[idx].disabled = true;
+                buttons[idx].classList.remove('hover:border-cyan-500', 'hover:bg-slate-800', 'cursor-pointer');
+            });
+        }
+
+        function nextQuestion() {
+            SoundFX.click();
+            currentIndex++;
+            loadQuestion();
+        }
+
+        function endQuiz() {
+            document.getElementById('quiz-screen').classList.add('hidden');
+            const resScreen = document.getElementById('result-screen');
+            resScreen.classList.remove('hidden');
+
+            const scoreText = `${score} / ${questionsList.length}`;
+            document.getElementById('final-score').textContent = scoreText;
+
+            const hasWon = score >= requiredCorrect;
+            let generatedCoupon = null;
+            let discountLabel = currentLevel === 'easy' ? '5%' : (currentLevel === 'medium' ? '10%' : '15%');
+
+            if (hasWon) {
+                SoundFX.win();
+                document.getElementById('result-icon').textContent = '🎉';
+                document.getElementById('result-title').textContent = 'Felicitări, ai câștigat!';
+                document.getElementById('result-subtitle').textContent = `Ai atins pragul minim de ${requiredCorrect} răspunsuri corecte pentru nivelul ${levelNames[currentLevel]}.`;
+
+                generatedCoupon = generateSecureCoupon(currentLevel);
+
+                document.getElementById('coupon-label').textContent = `Cupon Reducere ${discountLabel} MK Tech`;
+                document.getElementById('coupon-code').textContent = generatedCoupon;
+                document.getElementById('coupon-card').classList.remove('hidden');
+                document.getElementById('store-link').textContent = 'Folosește cuponul pe site-ul MK Tech ↗';
+            } else {
+                SoundFX.lose();
+                document.getElementById('result-icon').textContent = '😔';
+                document.getElementById('result-title').textContent = 'Prag Neatins';
+                document.getElementById('result-subtitle').textContent = `Aveai nevoie de minimum ${requiredCorrect} răspunsuri corecte pentru a debloca reducerea de la acest nivel.`;
+                document.getElementById('coupon-card').classList.add('hidden');
+                document.getElementById('store-link').textContent = 'Mergi pe site-ul MK Tech ↗';
+            }
+
+            localStorage.setItem('mktech_quiz_state', JSON.stringify({
+                played: true,
+                hasWon: hasWon,
+                couponCode: generatedCoupon,
+                discount: discountLabel,
+                scoreText: scoreText
+            }));
+        }
+
+        function copyCoupon() {
+            SoundFX.click();
+            const code = document.getElementById('coupon-code').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                const btn = document.getElementById('copy-btn');
+                btn.textContent = '✓ Copiat!';
+                btn.classList.replace('text-cyan-300', 'text-emerald-300');
+                setTimeout(() => {
+                    btn.textContent = '📋 Copiază';
+                    btn.classList.replace('text-emerald-300', 'text-cyan-300');
+                }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>
