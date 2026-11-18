@@ -340,23 +340,17 @@
                 <div class="absolute -right-10 -bottom-10 w-32 h-32 bg-cyan-500/10 rounded-full blur-2xl pointer-events-none"></div>
                 <p id="coupon-label" class="text-xs uppercase font-tech text-cyan-400 tracking-wider mb-2">Cupon Criptat MK Tech</p>
                 
-                <div class="flex items-center justify-center gap-3 my-3">
+                <div class="flex items-center justify-center gap-3 mt-3">
                     <div id="coupon-code" class="font-mono-tech text-2xl md:text-3xl font-bold text-white tracking-widest bg-slate-950/80 px-5 py-2.5 rounded-xl border border-cyan-500/30 select-all shadow-inner">MK05-XXXX</div>
                     <button onmouseenter="SoundFX.hover()" onclick="copyCoupon()" id="copy-btn" class="px-3.5 py-3 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 text-cyan-300 text-xs font-medium transition cursor-pointer">
                         📋 Copiază
                     </button>
                 </div>
-
-                <p class="text-xs text-slate-400">Codul conține o cheie matematică unică. Introdu-l la finalizarea comenzii pe site-ul MK Tech!</p>
             </div>
 
-            <div id="score-summary" class="bg-slate-800/50 border border-slate-700/50 rounded-xl p-4 text-sm text-slate-300 mb-6">
+            <div id="score-summary" class="bg-slate-800/50 border border-slate-700/50 rounded-xl p-4 text-sm text-slate-300">
                 Scor obținut: <span id="final-score" class="font-bold text-white">0</span> răspunsuri corecte.
             </div>
-
-            <a id="store-link" onmouseenter="SoundFX.hover()" onclick="SoundFX.click()" href="https://pixelcraft-fo.github.io/MKTech/index.html" target="_blank" class="inline-block w-full py-3.5 px-6 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-tech font-bold rounded-xl transition duration-200 shadow-lg shadow-cyan-500/20 cursor-pointer text-center">
-                Folosește cuponul pe site-ul MK Tech ↗
-            </a>
         </div>
 
     </div>
@@ -782,8 +776,7 @@
             { at: 12, text: "Montare nucleu grafic & arhitectură MK_OS...", status: "OK", sec: "FIREWALL ON" },
             { at: 28, text: "Conectare nod Colegiul Economic M.K. Focșani...", status: "SYNCED", sec: "TLS 1.3" },
             { at: 46, text: "Încărcare stocuri birotică, unități PC & periferice...", status: "OK", sec: "DB READY" },
-            { at: 65, text: "Anomalie detectată: Alex a fost pe aici...", status: "BYPASS", sec: "ALEX_OK" },
-            { at: 84, text: "Inițializare generator matematic cupoane (ASCII-Mod32)...", status: "ACTIVE", sec: "ENCRYPTED" },
+            { at: 72, text: "Inițializare generator matematic cupoane (ASCII-Mod32)...", status: "ACTIVE", sec: "ENCRYPTED" },
             { at: 98, text: "Toate sistemele sunt verzi. Lansare interfață!", status: "READY", sec: "UNLOCKED" }
         ];
 
@@ -879,10 +872,9 @@
 
                         const line = document.createElement('div');
                         line.className = "flex justify-between items-center animate-fade";
-                        const badgeColor = step.status === 'BYPASS' ? 'text-amber-400' : 'text-emerald-400';
                         line.innerHTML = `
                             <span class="truncate pr-2"><span class="text-cyan-400 mr-1.5">&gt;</span>${step.text}</span>
-                            <span class="${badgeColor} font-bold shrink-0">[${step.status}]</span>
+                            <span class="text-emerald-400 font-bold shrink-0">[${step.status}]</span>
                         `;
                         logsContainer.appendChild(line);
                         logsContainer.scrollTop = logsContainer.scrollHeight;
@@ -932,13 +924,11 @@
                 document.getElementById('coupon-code').textContent = state.couponCode;
                 document.getElementById('coupon-label').textContent = `Cupon Reducere (${state.discount || ''})`;
                 document.getElementById('coupon-card').classList.remove('hidden');
-                document.getElementById('store-link').textContent = 'Folosește cuponul pe site-ul MK Tech ↗';
             } else {
                 document.getElementById('result-icon').textContent = '⚠️';
                 document.getElementById('result-title').textContent = 'Acces Restricționat';
                 document.getElementById('result-subtitle').textContent = 'Ai utilizat deja încercarea ta unică pentru acest quiz.';
                 document.getElementById('coupon-card').classList.add('hidden');
-                document.getElementById('store-link').textContent = 'Mergi pe site-ul MK Tech ↗';
             }
         }
 
@@ -1165,14 +1155,12 @@
                 document.getElementById('coupon-label').textContent = `Cupon Reducere ${discountLabel} MK Tech`;
                 document.getElementById('coupon-code').textContent = generatedCoupon;
                 document.getElementById('coupon-card').classList.remove('hidden');
-                document.getElementById('store-link').textContent = 'Folosește cuponul pe site-ul MK Tech ↗';
             } else {
                 SoundFX.lose();
                 document.getElementById('result-icon').textContent = '😔';
                 document.getElementById('result-title').textContent = 'Prag Neatins';
                 document.getElementById('result-subtitle').textContent = `Aveai nevoie de minimum ${requiredCorrect} răspunsuri corecte pentru a debloca reducerea de la acest nivel.`;
                 document.getElementById('coupon-card').classList.add('hidden');
-                document.getElementById('store-link').textContent = 'Mergi pe site-ul MK Tech ↗';
             }
 
             localStorage.setItem('mktech_quiz_state', JSON.stringify({
